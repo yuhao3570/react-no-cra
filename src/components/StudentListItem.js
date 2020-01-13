@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
 
-export default function StudentListItem({ student, updateStudent, deleteStudent }) {
-  const [studentName, setStudentName] = useState(student);
+export default function StudentListItem(props) {
+  const { student } = props;
+  const [studentName, setStudentName] = useState([student]);
+
+  const handleButtonClick = (e) => {
+    props[e.target.id](student, studentName);
+  };
+
+  const handleInput = (e) => setStudentName(e.target.value);
 
   return (
     <div>
-      <input value={studentName} type="text" onChange={(e) => setStudentName(e.target.value)} />
-      <button type="submit" action="update" onClick={() => updateStudent(student, studentName)}>Update</button>
-      <button type="submit" action="delete" onClick={() => deleteStudent(studentName)}>Delete</button>
+      <input value={studentName} type="text" onChange={handleInput} />
+      <button type="submit" id="updateStudent" onClick={handleButtonClick}>Update</button>
+      <button type="submit" id="deleteStudent" onClick={handleButtonClick}>Delete</button>
     </div>
   );
 }

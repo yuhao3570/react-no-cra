@@ -1,36 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import StudentListItem from './components/StudentListItem';
+import handler from '../services/handler';
 
 export default function App() {
   const [students, setStudents] = useState([]);
   const [newStudent, setNewStudent] = useState('');
 
-  const handler = (action, data) => {
-    const fetchConfig = {
-      method: action,
-    };
-    if (action !== 'GET') {
-      Object.assign(fetchConfig, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-    }
-    fetch('http://localhost:3000/students', fetchConfig)
-      .then((res) => res.json())
-      .then((result) => setStudents(result))
-      .catch();
+  const buttonActionHandler = {
+    GET: () => handler(setStudents, 'GET'),
+    POST: () => {
+      handler(setStudents, 'POST', { newStudent });
+      setNewStudent('');
+    },
+    PUT: (student, newStudentName) => handler(setStudents, 'PUT', { student, newStudentName }),
+    DELETE: (student) => handler(setStudents, 'DELETE', { student }),
   };
+
+  const handelInput = (e) => setNewStudent(e.target.value);
 
   useEffect(() => {
-    handler('GET');
+    buttonActionHandler.GET();
   }, []);
-
-  const submitNewStudent = () => {
-    handler('POST', { studentName: newStudent });
-    setNewStudent('');
-  };
 
   return (
     <div>
@@ -40,13 +30,13 @@ export default function App() {
         <StudentListItem
           student={student}
           key={student}
-          deleteStudent={(studentName) => handler('DELETE', { studentName })}
-          updateStudent={(oldName, newName) => handler('PUT', { oldName, newName })}
+          deleteStudent={buttonActionHandler.DELETE}
+          updateStudent={buttonActionHandler.PUT}
         />
       ))}
       <hr />
-      <input value={newStudent} onChange={(e) => setNewStudent(e.target.value)} />
-      <button type="submit" onClick={submitNewStudent}>Create</button>
+      <input value={newStudent} onChange={handelInput} />
+      <button type="submit" onClick={buttonActionHandler.POST}>Create</button>
     </div>
   );
 }
