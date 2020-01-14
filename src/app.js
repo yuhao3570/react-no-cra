@@ -6,37 +6,57 @@ export default function App() {
   const [students, setStudents] = useState([]);
   const [newStudent, setNewStudent] = useState('');
 
-  const buttonActionHandler = {
-    GET: () => handler(setStudents, 'GET'),
+  const fetchStudents = () => {
+    handler('GET', null, setStudents);
+  };
+
+  const studentHttpActions = {
+    GET: fetchStudents,
     POST: () => {
-      handler(setStudents, 'POST', { newStudent });
+      if (!students.includes(newStudent)) {
+        handler('POST', { newStudent }, fetchStudents);
+      } else {
+        alert(`${newStudent} already exist`);
+      }
       setNewStudent('');
     },
-    PUT: (student, newStudentName) => handler(setStudents, 'PUT', { student, newStudentName }),
-    DELETE: (student) => handler(setStudents, 'DELETE', { student }),
+    PUT: (student, newStudentName, callback) => {
+      if (!students.includes(newStudentName)) {
+        handler('PUT', { student, newStudentName }, fetchStudents);
+      } else {
+        alert(`${newStudentName} already exist`);
+        callback(student);
+      }
+    },
+    DELETE: (student) => handler('DELETE', { student }, fetchStudents),
   };
 
   const handelInput = (e) => setNewStudent(e.target.value);
 
   useEffect(() => {
-    buttonActionHandler.GET();
+    studentHttpActions.GET();
   }, []);
 
   return (
     <div>
-      <h2>hello</h2>
+      <h2> hello students </h2>
       <hr />
-      {students.map((student) => (
-        <StudentListItem
-          student={student}
-          key={student}
-          deleteStudent={buttonActionHandler.DELETE}
-          updateStudent={buttonActionHandler.PUT}
-        />
-      ))}
+      {
+        students.map((student) => (
+          <StudentListItem
+            student={student}
+            key={student}
+            deleteStudent={studentHttpActions.DELETE}
+            updateStudent={studentHttpActions.PUT}
+          />
+        ))
+      }
       <hr />
-      <input value={newStudent} onChange={handelInput} />
-      <button type="submit" onClick={buttonActionHandler.POST}>Create</button>
+      <input
+        value={newStudent}
+        onChange={handelInput}
+      />
+      <button type="submit" onClick={studentHttpActions.POST}> Create </button>
     </div>
   );
 }

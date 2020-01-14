@@ -2,10 +2,14 @@ import React, { useState } from 'react';
 
 export default function StudentListItem(props) {
   const { student } = props;
-  const [studentName, setStudentName] = useState([student]);
+  const [studentName, setStudentName] = useState(student);
 
-  const handleButtonClick = (e) => {
-    props[e.target.id](student, studentName);
+  const handleDelete = () => {
+    props.deleteStudent(student);
+  };
+
+  const handleUpdate = () => {
+    props.updateStudent(student, studentName, setStudentName);
   };
 
   const handleInput = (e) => setStudentName(e.target.value);
@@ -13,8 +17,8 @@ export default function StudentListItem(props) {
   return (
     <div>
       <input value={studentName} type="text" onChange={handleInput} />
-      <button type="submit" id="updateStudent" onClick={handleButtonClick}>Update</button>
-      <button type="submit" id="deleteStudent" onClick={handleButtonClick}>Delete</button>
+      <button type="submit" onClick={handleUpdate}>Update</button>
+      <button type="submit" onClick={handleDelete}>Delete</button>
     </div>
   );
 }

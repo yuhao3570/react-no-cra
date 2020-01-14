@@ -7,30 +7,25 @@ function setUrl(action, data) {
   return url;
 }
 
-function getStudents(callback) {
-  fetch(url)
-    .then((res) => res.json())
-    .then((result) => callback(result.studentsData))
-    .catch();
-}
+const headersProcessor = {
+  GET: {},
+  OTHERS: { 'Content-Type': 'application/json' },
+};
 
-export default (callback, action, data = null) => {
+const bodyProcessor = {
+  GET: () => null,
+  OTHERS: (data) => JSON.stringify(data),
+};
+
+export default (action, data = null, callback) => {
   const fetchConfig = {
     method: action,
+    headers: (headersProcessor[action] || headersProcessor.OTHERS),
+    body: (bodyProcessor[action] || bodyProcessor.OTHERS)(data),
   };
-  if (action !== 'GET') {
-    Object.assign(fetchConfig, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-    fetch(setUrl(action, data), fetchConfig)
-      // .then((res) => res.json())
-      // .then((result) => console.log(result.message))
-      .then(() => getStudents(callback))
-      .catch();
-  } else {
-    getStudents(callback);
-  }
+  console.log(fetchConfig);
+  fetch(setUrl(action, data), fetchConfig)
+    .then((res) => res.json())
+    .then(callback)
+    .catch();
 };

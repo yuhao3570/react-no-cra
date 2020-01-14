@@ -27,7 +27,8 @@
     "import/no-unresolved": "off",
     "linebreak-style": "off",
     "react/prop-types": "off",
-    "no-named-as-default": "off"
+    "no-named-as-default": "off",
+    "no-alert": "off"
   },
   "root": true
 }
